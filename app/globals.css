@@ -45,6 +45,26 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* 頁面背景 */
+  --color-page: #f8fafc;
+
+  /* 任務狀態 — 卡片背景 */
+  --color-in-progress-bg: #f5d565;
+  --color-completed-bg: #a0ecb1;
+  --color-wont-do-bg: #f7d4d3;
+  --color-todo-bg: #e3e8ef;
+  --color-add-task-bg: #f5e8d5;
+
+  /* 任務狀態 — icon 背景 */
+  --color-in-progress-icon: #e9a23b;
+  --color-completed-icon: #32d657;
+  --color-wont-do-icon: #dd524c;
+  --color-add-task-icon: #e9a23b;
+
+  /* 通用 UI */
+  --color-action-primary: #3662e3;
+  --color-action-secondary: #97a3b6;
 }
 
 :root {
@@ -114,6 +134,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* 忽略系統深色模式 */
+@media (prefers-color-scheme: dark) {
+  :root:not(.dark) {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+  }
 }
 
 @layer base {
