@@ -215,7 +215,7 @@ export default function TaskDrawer({
                 <button
                   key={key}
                   onClick={() => toggleStatus(key)}
-                  className={`flex items-center gap-3 px-0.5 py-0.5 rounded-xl border-2 transition-colors text-left cursor-pointer bg-white ${
+                  className={`flex items-center gap-2 px-0.5 py-0.5 rounded-xl border-2 transition-colors text-left cursor-pointer bg-white ${
                     status === key
                       ? 'border-(--color-action-primary)'
                       : 'border-gray-200'
@@ -226,11 +226,11 @@ export default function TaskDrawer({
                   >
                     <Icon size={18} className={iconColor} />
                   </div>
-                  <span className="font-medium text-gray-800 flex-1 text-sm">
+                  <span className="font-medium text-gray-800 flex-1 text-xs">
                     {label}
                   </span>
                   {status === key && (
-                    <div className="w-5 h-5 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0 mr-2">
+                    <div className="mr-1 w-5 h-5 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
                       <Check size={12} className="text-white" />
                     </div>
                   )}
@@ -245,7 +245,7 @@ export default function TaskDrawer({
             <button
               onClick={handleDelete}
               disabled={isPending}
-              className="px-4 py-1 rounded-full text-sm font-medium text-white bg-(--color-action-secondary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-secondary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
             >
               Delete <Trash2 size={16} />
             </button>
@@ -253,7 +253,7 @@ export default function TaskDrawer({
           <button
             onClick={handleSave}
             disabled={!name.trim() || isPending}
-            className="px-4 py-1 rounded-full text-sm font-medium text-white bg-(--color-action-primary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-primary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
           >
             Save <Check size={16} />
           </button>
