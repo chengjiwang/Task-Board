@@ -26,7 +26,7 @@ export default function CreateBoardButton() {
     startTransition(async () => {
       const boardId = await createBoard({
         name: name.trim(),
-        description: description.trim() || undefined,
+        description: description.trim(),
       });
       setOpen(false);
       setName('');
