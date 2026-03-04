@@ -1,5 +1,6 @@
 'use client';
 
+import BoardEditDrawer from '@/components/board/BoardEditDrawer';
 import BoardHeader from '@/components/board/BoardHeader';
 import TaskList from '@/components/board/TaskList';
 import TaskDrawer from '@/components/task/TaskDrawer';
@@ -22,8 +23,7 @@ export default function BoardMain({ board }: BoardMainProps) {
     undefined,
   );
 
-  // TODO: BoardEditDrawer
-  const [, setBoardEditDrawerOpen] = useState(false);
+  const [boardEditDrawerOpen, setBoardEditDrawerOpen] = useState(false);
 
   const handleTaskClick = (task: ITask) => {
     setSelectedTask(task);
@@ -59,6 +59,12 @@ export default function BoardMain({ board }: BoardMainProps) {
           onTaskClick={handleTaskClick}
         />
       </div>
+
+      <BoardEditDrawer
+        board={board}
+        isOpen={boardEditDrawerOpen}
+        onClose={() => setBoardEditDrawerOpen(false)}
+      />
 
       {/* TaskDrawer — edit mode */}
       <TaskDrawer
