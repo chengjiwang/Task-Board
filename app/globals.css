@@ -61,6 +61,8 @@
   --color-completed-icon: #32d657;
   --color-wont-do-icon: #dd524c;
   --color-add-task-icon: #e9a23b;
+  --color-icon-bg-selected: #f5d565;
+  --color-icon-bg-unselected: #e3e8ef;
 
   /* 通用 UI */
   --color-action-primary: #3662e3;

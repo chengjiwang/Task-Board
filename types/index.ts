@@ -4,7 +4,7 @@ export type TaskIcon =
   | 'clock'
   | 'bubble'
   | 'coffee'
-  | 'robot'
+  | 'workout'
   | 'stack'
   | 'person';
 
