@@ -98,7 +98,7 @@ export default function TaskDrawer({
     try {
       const data = {
         name: name.trim(),
-        description: description.trim() || undefined,
+        description: description.trim(),
         icon,
         status,
       };
