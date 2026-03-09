@@ -1,7 +1,7 @@
 'use client';
 
 import type { ITask, TaskIcon, TaskStatus } from '@/types';
-import { Check, Clock, X } from 'lucide-react';
+import Image from 'next/image';
 
 const ICON_MAP: Record<TaskIcon, string> = {
   clock: '⏰',
@@ -38,9 +38,30 @@ function StatusIcon({ status }: { status: TaskStatus }) {
     <div
       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}
     >
-      {status === 'in_progress' && <Clock size={18} className="text-white" />}
-      {status === 'completed' && <Check size={18} className="text-white" />}
-      {status === 'wont_do' && <X size={18} className="text-white" />}
+      {status === 'in_progress' && (
+        <Image
+          src="/icons/time_atack_duotone.svg"
+          alt="in progress"
+          width={20}
+          height={20}
+        />
+      )}
+      {status === 'completed' && (
+        <Image
+          src="/icons/done_round_duotone.svg"
+          alt="completed"
+          width={20}
+          height={20}
+        />
+      )}
+      {status === 'wont_do' && (
+        <Image
+          src="/icons/close_ring_duotone.svg"
+          alt="wont do"
+          width={20}
+          height={20}
+        />
+      )}
     </div>
   );
 }

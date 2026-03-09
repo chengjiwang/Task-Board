@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { addTask, deleteTask, updateTask } from '@/lib/actions/taskActions';
 import type { ITask, TaskIcon, TaskStatus } from '@/types';
-import { Check, Clock, Trash2, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { Check, Trash2, X } from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 const ICONS: { key: TaskIcon; emoji: string }[] = [
   { key: 'person', emoji: '🧑‍💻' },
@@ -20,29 +21,25 @@ const STATUS_OPTIONS: {
   key: TaskStatus;
   label: string;
   iconBg: string;
-  Icon: React.ElementType;
-  iconColor: string;
+  iconSrc: string;
 }[] = [
   {
     key: 'in_progress',
     label: 'In Progress',
     iconBg: 'bg-in-progress-icon',
-    Icon: Clock,
-    iconColor: 'text-white',
+    iconSrc: '/icons/time_atack_duotone.svg',
   },
   {
     key: 'completed',
     label: 'Completed',
     iconBg: 'bg-completed-icon',
-    Icon: Check,
-    iconColor: 'text-white',
+    iconSrc: '/icons/done_round_duotone.svg',
   },
   {
     key: 'wont_do',
     label: "Won't Do",
     iconBg: 'bg-wont-do-icon',
-    Icon: X,
-    iconColor: 'text-white',
+    iconSrc: '/icons/close_ring_duotone.svg',
   },
 ];
 
@@ -211,7 +208,7 @@ export default function TaskDrawer({
               Status
             </label>
             <div className="grid grid-cols-2 gap-2">
-              {STATUS_OPTIONS.map(({ key, label, iconBg, Icon, iconColor }) => (
+              {STATUS_OPTIONS.map(({ key, label, iconBg, iconSrc }) => (
                 <button
                   key={key}
                   onClick={() => toggleStatus(key)}
@@ -224,13 +221,13 @@ export default function TaskDrawer({
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
                   >
-                    <Icon size={18} className={iconColor} />
+                    <Image src={iconSrc} alt={label} width={18} height={18} />
                   </div>
                   <span className="font-medium text-gray-800 flex-1 text-xs">
                     {label}
                   </span>
                   {status === key && (
-                    <div className="mr-1 w-5 h-5 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
+                    <div className="mr-1 w-4 h-4 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
                       <Check size={12} className="text-white" />
                     </div>
                   )}
