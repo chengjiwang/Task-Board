@@ -148,9 +148,9 @@ export default function TaskDrawer({
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 cursor-pointer"
+            className="p-1.5 rounded-md border hover:bg-gray-100 text-gray-400 hover:text-gray-600 cursor-pointer"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         {/* Form */}
