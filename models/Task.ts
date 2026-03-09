@@ -18,7 +18,7 @@ const TaskSchema = new Schema<ITask>(
     },
     icon: {
       type: String,
-      enum: ['clock', 'bubble', 'coffee', 'robot', 'stack', 'person'],
+      enum: ['clock', 'bubble', 'coffee', 'workout', 'stack', 'person'],
       default: 'stack',
     },
     status: {
