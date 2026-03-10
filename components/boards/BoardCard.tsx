@@ -1,14 +1,13 @@
 'use client';
 
 import type { IBoard } from '@/types';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface BoardCardProps {
   board: IBoard;
 }
 
 export default function BoardCard({ board }: BoardCardProps) {
-  const router = useRouter();
   const id = board._id.toString();
 
   const formatDate = (date: Date | string) => {
@@ -21,9 +20,9 @@ export default function BoardCard({ board }: BoardCardProps) {
 
   return (
     <>
-      <div
+      <Link
+        href={`/board/${id}`}
         className="relative group bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-md transition-shadow"
-        onClick={() => router.push(`/board/${id}`)}
       >
         <h2 className="font-semibold text-gray-900 text-base pr-8 truncate">
           {board.name}
@@ -41,7 +40,7 @@ export default function BoardCard({ board }: BoardCardProps) {
           </span>
           <span>{formatDate(board.createdAt)}</span>
         </div>
-      </div>
+      </Link>
     </>
   );
 }
