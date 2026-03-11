@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<h1 align="center">Task Board</h1>
 
-## Getting Started
+<div align="center">
+   Solution for a challenge <a href="https://devchallenges.io/challenge/my-task-board-app" target="_blank">My Task Board
+</a> from <a href="http://devchallenges.io" target="_blank">devChallenges.io</a>.
+</div>
 
-First, run the development server:
+<div align="center">
+  <h3>
+    <a href="https://task-board-rho-five.vercel.app/">
+      Demo
+    </a>
+    <span> | </span>
+    <a href="https://devchallenges.io/challenge/my-task-board-app">
+      Challenge
+    </a>
+  </h3>
+</div>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<!-- TABLE OF CONTENTS -->
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Table of Contents
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [Overview](#overview)
+- [Features](#features)
+- [Built with](#built-with)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+<!-- OVERVIEW -->
 
-## Learn More
+## Overview
 
-To learn more about Next.js, take a look at the following resources:
+This project is based on the [My Task Board](https://devchallenges.io/challenge/my-task-board-app) challenge from DevChallenges, with additional features beyond the original spec.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The original challenge focuses on a **single board** experience — users visit the app, a board is auto-created, and they can manage tasks on that board. There is no concept of managing multiple boards in the original design.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The following features were **extended beyond the challenge requirements**:
 
-## Deploy on Vercel
+- **All Boards Page** — a home page that lists all existing boards, letting users switch between them or create new ones.
+- **Edit Board** — a drawer UI to update the board's name and description, along with a delete board option. The original challenge only requires simple inline editing of the board name/description without a dedicated edit UI.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### All Boards Page (Extended)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+View all boards and create a new board.
+
+![Image](./demoImage/all_boards.png)
+
+### Task Board Page
+
+Edit the board, view tasks, and create/edit tasks.
+
+![Image](./demoImage/task_board.png)
+
+Edit board (Extended)
+![Image](./demoImage/edit_board.png)
+
+Edit task
+![Image](./demoImage/edit_task.png)
+
+## Features
+
+This application/site was created as a submission to a [DevChallenges](https://devchallenges.io/challenges-dashboard) challenge.
+
+- Create, edit, and delete **Boards** to organize your work
+- Add, edit, and delete **Tasks** within each board
+- Assign a **status** to each task: Todo, In Progress, Completed, or Won't Do — each with a distinct color
+- Choose from **6 emoji icons** per task
+
+### Built with
+
+- Next.js — App Router, Server Components & Server Actions
+- TypeScript
+- MongoDB + Mongoose — database & ODM
+- Tailwind CSS
+- [shadcn/ui](https://ui.shadcn.com/) — accessible UI components
