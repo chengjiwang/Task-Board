@@ -20,6 +20,7 @@ export async function addTask(
   });
   await Board.findByIdAndUpdate(boardId, { $push: { tasks: task._id } });
   revalidatePath(`/board/${boardId}`);
+  revalidatePath('/');
   return JSON.parse(JSON.stringify(task));
 }
 
@@ -40,4 +41,5 @@ export async function deleteTask(
   await Task.findByIdAndDelete(taskId);
   await Board.findByIdAndUpdate(boardId, { $pull: { tasks: taskId } });
   revalidatePath(`/board/${boardId}`);
+  revalidatePath('/');
 }
