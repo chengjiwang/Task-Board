@@ -67,8 +67,9 @@ export default function BoardEditDrawer({
 
     try {
       await deleteBoard(board._id.toString());
+      router.replace('/');
+      router.refresh();
       onClose();
-      router.push('/');
     } finally {
       setIsPending(false);
     }
@@ -86,6 +87,13 @@ export default function BoardEditDrawer({
 
       {/* Panel */}
       <div className="relative z-10 w-full max-w-md bg-white h-full shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-200">
+        {/* loading overlay */}
+        {isPending && (
+          <div className="absolute inset-0 z-20 bg-white/80 flex flex-col items-center justify-center gap-3">
+            <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-700 rounded-full animate-spin" />
+            <p className="text-sm text-gray-600 font-medium">Processing…</p>
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-2">
           <h2 className="text-lg font-bold text-gray-900">Edit Board</h2>
