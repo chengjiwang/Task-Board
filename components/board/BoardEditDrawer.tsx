@@ -51,6 +51,8 @@ export default function BoardEditDrawer({
         name: name.trim(),
         description: description.trim(),
       });
+      
+      router.prefetch('/');
       router.refresh();
       onClose();
     } finally {
