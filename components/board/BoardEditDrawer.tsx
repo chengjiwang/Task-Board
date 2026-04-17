@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { deleteBoard, updateBoard } from '@/lib/actions/boardActions';
 import type { IBoard } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface BoardEditDrawerProps {
@@ -28,6 +29,7 @@ export default function BoardEditDrawer({
   isOpen,
   onClose,
 }: BoardEditDrawerProps) {
+  const router = useRouter();
   const [showAlert, setShowAlert] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -49,6 +51,7 @@ export default function BoardEditDrawer({
         name: name.trim(),
         description: description.trim(),
       });
+      router.refresh();
       onClose();
     } finally {
       setIsPending(false);
