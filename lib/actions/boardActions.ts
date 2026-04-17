@@ -35,6 +35,7 @@ export async function updateBoard(
   await connectDB();
   await Board.findByIdAndUpdate(boardId, data);
   revalidatePath(`/board/${boardId}`);
+  revalidatePath('/');
 }
 
 export async function deleteBoard(boardId: string): Promise<void> {
