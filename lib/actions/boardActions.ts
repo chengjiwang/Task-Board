@@ -5,6 +5,7 @@ import Task from '@/models/Task';
 import type { IBoard } from '@/types';
 import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
+import { redirect } from 'next/navigation';
 
 export async function getBoards(): Promise<IBoard[]> {
   await connectDB();
@@ -42,5 +43,7 @@ export async function deleteBoard(boardId: string): Promise<void> {
   await connectDB();
   await Board.findByIdAndDelete(boardId);
   await Task.deleteMany({ boardId });
+
   revalidatePath('/');
+  redirect('/'); // Redirect to home after deletion to avoid showing a now-nonexistent board page
 }
