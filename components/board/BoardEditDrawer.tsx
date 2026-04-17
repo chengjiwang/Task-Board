@@ -62,14 +62,7 @@ export default function BoardEditDrawer({
 
   const handleConfirmDelete = async () => {
     setIsPending(true);
-
-    try {
-      await deleteBoard(board._id.toString());
-      onClose();
-      window.location.href = '/';
-    } finally {
-      setIsPending(false);
-    }
+    await deleteBoard(board._id.toString());
   };
 
   if (!isOpen) return null;
