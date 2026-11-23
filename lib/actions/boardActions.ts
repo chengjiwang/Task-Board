@@ -35,7 +35,7 @@ export async function updateBoard(
   data: Partial<Pick<IBoard, 'name' | 'description'>>,
 ): Promise<void> {
   await connectDB();
-  await Board.findByIdAndUpdate(boardId, data);
+  await Board.findByIdAndUpdate(boardId, data, { runValidators: true });
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
 }

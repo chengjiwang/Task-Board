@@ -29,7 +29,11 @@ export async function updateTask(
   data: Partial<Pick<ITask, 'name' | 'description' | 'icon' | 'status'>>,
 ): Promise<void> {
   await connectDB();
-  const task = await Task.findByIdAndUpdate(taskId, data, { new: true });
+  const task = await Task.findByIdAndUpdate(taskId, data, {
+    new: true,
+    runValidators: true,
+  });
+  if (!task) throw new Error('Task not found');
   revalidatePath(`/board/${task.boardId}`);
 }
 

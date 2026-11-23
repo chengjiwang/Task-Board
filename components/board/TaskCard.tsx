@@ -33,7 +33,7 @@ const STATUS_STYLES: Record<
 
 function StatusIcon({ status }: { status: TaskStatus }) {
   if (status === 'todo') return null;
-  const { iconBg } = STATUS_STYLES[status];
+  const { iconBg } = STATUS_STYLES[status] ?? STATUS_STYLES.todo;
   return (
     <div
       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}
@@ -72,7 +72,7 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, onClick }: TaskCardProps) {
-  const { card } = STATUS_STYLES[task.status];
+  const { card } = STATUS_STYLES[task.status] ?? STATUS_STYLES.todo;
 
   return (
     <div
