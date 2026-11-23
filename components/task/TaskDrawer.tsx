@@ -6,6 +6,7 @@ import { addTask, deleteTask, updateTask } from '@/lib/actions/taskActions';
 import type { ITask, TaskIcon, TaskStatus } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const ICONS: { key: TaskIcon; emoji: string }[] = [
@@ -71,10 +72,13 @@ export default function TaskDrawer({
   const [icon, setIcon] = useState<TaskIcon>('person');
   const [status, setStatus] = useState<TaskStatus>('todo');
   const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Sync form when drawer opens
   useEffect(() => {
     if (isOpen) {
+      setError(null);
       if (mode === 'edit' && task) {
         setName(task.name);
         setDescription(task.description ?? '');
@@ -106,9 +110,16 @@ export default function TaskDrawer({
           await addTask(boardId, data);
         }
       } else if (mode === 'edit' && task) {
-        await updateTask(task._id.toString(), data);
+        const res = await updateTask(task._id.toString(), data);
+        if (!res.ok) {
+          setError(res.error);
+          router.refresh();
+          return;
+        }
       }
       onClose();
+    } catch {
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsPending(false);
     }
@@ -118,8 +129,14 @@ export default function TaskDrawer({
     if (mode !== 'edit' || !task) return;
     setIsPending(true);
     try {
-      await deleteTask(task._id.toString(), boardId);
+      const res = await deleteTask(task._id.toString(), boardId);
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
       onClose();
+    } catch {
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsPending(false);
     }
@@ -236,6 +253,11 @@ export default function TaskDrawer({
             </div>
           </div>
         </div>
+        {error && (
+          <p role="alert" className="px-6 text-sm text-red-600">
+            {error}
+          </p>
+        )}
         {/* Footer buttons */}
         <div className="px-6 py-5 flex justify-end gap-3">
           {mode === 'edit' && (
