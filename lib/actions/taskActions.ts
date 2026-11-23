@@ -3,6 +3,7 @@
 import Board from '@/models/Board';
 import Task from '@/models/Task';
 import type { ITask } from '@/types';
+import { isValidObjectId } from 'mongoose';
 import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
 
@@ -24,26 +25,38 @@ export async function addTask(
   return JSON.parse(JSON.stringify(task));
 }
 
+export type ActionResult = { ok: true } | { ok: false; error: string };
+
 export async function updateTask(
   taskId: string,
   data: Partial<Pick<ITask, 'name' | 'description' | 'icon' | 'status'>>,
-): Promise<void> {
+): Promise<ActionResult> {
+  if (!isValidObjectId(taskId)) {
+    return { ok: false, error: 'Invalid task ID' };
+  }
   await connectDB();
   const task = await Task.findByIdAndUpdate(taskId, data, {
     new: true,
     runValidators: true,
   });
-  if (!task) throw new Error('Task not found');
+  if (!task) {
+    return { ok: false, error: 'Task not found. It may have been deleted.' };
+  }
   revalidatePath(`/board/${task.boardId}`);
+  return { ok: true };
 }
 
 export async function deleteTask(
   taskId: string,
   boardId: string,
-): Promise<void> {
+): Promise<ActionResult> {
+  if (!isValidObjectId(taskId) || !isValidObjectId(boardId)) {
+    return { ok: false, error: 'Invalid ID' };
+  }
   await connectDB();
   await Task.findByIdAndDelete(taskId);
   await Board.findByIdAndUpdate(boardId, { $pull: { tasks: taskId } });
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
+  return { ok: true };
 }
