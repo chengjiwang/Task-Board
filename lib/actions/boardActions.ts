@@ -14,6 +14,7 @@ export async function getBoards(): Promise<IBoard[]> {
 }
 
 export async function getBoard(boardId: string): Promise<IBoard | null> {
+  if (!/^[0-9a-f]{24}$/i.test(boardId)) return null;
   await connectDB();
   const board = await Board.findById(boardId).populate('tasks').lean();
   if (!board) return null;
