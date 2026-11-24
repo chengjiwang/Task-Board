@@ -1,13 +1,18 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { addTask, deleteTask, updateTask } from '@/lib/actions/taskActions';
 import type { ITask, TaskIcon, TaskStatus } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 const ICONS: { key: TaskIcon; emoji: string }[] = [
   { key: 'person', emoji: '🧑‍💻' },
@@ -74,6 +79,9 @@ export default function TaskDrawer({
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const uid = useId();
+  const nameId = `${uid}-name`;
+  const descId = `${uid}-description`;
 
   // Sync form when drawer opens
   useEffect(() => {
@@ -93,7 +101,8 @@ export default function TaskDrawer({
     }
   }, [isOpen, mode, task]);
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!name.trim()) return;
     setIsPending(true);
     try {
@@ -150,138 +159,153 @@ export default function TaskDrawer({
     setStatus((prev) => (prev === s ? 'todo' : s));
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-(--color-overlay)"
-        onClick={onClose}
-      />
-
-      {/* Panel */}
-      <div className="relative z-10 w-full max-w-md bg-white h-full shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-right duration-200">
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent aria-describedby={undefined}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-2">
-          <h2 className="text-lg font-bold text-gray-900">
+          <SheetTitle>
             {mode === 'create' ? 'Add New Task' : 'Edit Task'}
-          </h2>
+          </SheetTitle>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close"
             className="p-1.5 rounded-md border hover:bg-gray-100 text-gray-400 hover:text-gray-600 cursor-pointer"
           >
             <X size={18} />
           </button>
         </div>
-        {/* Form */}
-        <div className="flex-1 px-6 py-4 space-y-5">
-          {/* Task name */}
-          <div>
-            <label className="block text-xs font-medium text-action-secondary mb-1.5">
-              Task name
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter task name"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-xs font-medium text-action-secondary mb-1.5">
-              Description
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter a short description"
-              rows={3}
-            />
-          </div>
-
-          {/* Icon picker */}
-          <div>
-            <label className="block text-xs font-medium text-action-secondary mb-1.5">
-              Icon
-            </label>
-            <div className="flex gap-2 flex-wrap">
-              {ICONS.map(({ key, emoji }) => (
-                <button
-                  key={key}
-                  onClick={() => setIcon(key)}
-                  className={`w-11 h-11 rounded-lg text-xl flex items-center justify-center transition-colors cursor-pointer ${
-                    icon === key
-                      ? 'bg-icon-bg-selected'
-                      : 'bg-icon-bg-unselected hover:bg-icon-bg-selected'
-                  }`}
-                >
-                  {emoji}
-                </button>
-              ))}
+        <form onSubmit={handleSave} className="flex flex-1 flex-col">
+          {/* Form */}
+          <div className="flex-1 px-6 py-4 space-y-5">
+            {/* Task name */}
+            <div>
+              <label
+                htmlFor={nameId}
+                className="block text-xs font-medium text-action-secondary mb-1.5"
+              >
+                Task name
+              </label>
+              <Input
+                id={nameId}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter task name"
+              />
             </div>
-          </div>
 
-          {/* Status picker */}
-          <div>
-            <label className="block text-xs font-medium text-action-secondary mb-1.5">
-              Status
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {STATUS_OPTIONS.map(({ key, label, iconBg, iconSrc }) => (
-                <button
-                  key={key}
-                  onClick={() => toggleStatus(key)}
-                  className={`flex items-center gap-2 px-0.5 py-0.5 rounded-xl border-2 transition-colors text-left cursor-pointer bg-white ${
-                    status === key
-                      ? 'border-(--color-action-primary)'
-                      : 'border-gray-200'
-                  }`}
-                >
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
+            {/* Description */}
+            <div>
+              <label
+                htmlFor={descId}
+                className="block text-xs font-medium text-action-secondary mb-1.5"
+              >
+                Description
+              </label>
+              <Textarea
+                id={descId}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter a short description"
+                rows={3}
+              />
+            </div>
+
+            {/* Icon picker */}
+            <div role="group" aria-labelledby={`${uid}-icon`}>
+              <span
+                id={`${uid}-icon`}
+                className="block text-xs font-medium text-action-secondary mb-1.5"
+              >
+                Icon
+              </span>
+              <div className="flex gap-2 flex-wrap">
+                {ICONS.map(({ key, emoji }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-label={key}
+                    aria-pressed={icon === key}
+                    onClick={() => setIcon(key)}
+                    className={`w-11 h-11 rounded-lg text-xl flex items-center justify-center transition-colors cursor-pointer ${
+                      icon === key
+                        ? 'bg-icon-bg-selected'
+                        : 'bg-icon-bg-unselected hover:bg-icon-bg-selected'
+                    }`}
                   >
-                    <Image src={iconSrc} alt={label} width={18} height={18} />
-                  </div>
-                  <span className="font-medium text-gray-800 flex-1 text-xs">
-                    {label}
-                  </span>
-                  {status === key && (
-                    <div className="mr-1 w-4 h-4 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
-                      <Check size={12} className="text-white" />
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Status picker */}
+            <div role="group" aria-labelledby={`${uid}-status`}>
+              <span
+                id={`${uid}-status`}
+                className="block text-xs font-medium text-action-secondary mb-1.5"
+              >
+                Status
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {STATUS_OPTIONS.map(({ key, label, iconBg, iconSrc }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={status === key}
+                    onClick={() => toggleStatus(key)}
+                    className={`flex items-center gap-2 px-0.5 py-0.5 rounded-xl border-2 transition-colors text-left cursor-pointer bg-white ${
+                      status === key
+                        ? 'border-(--color-action-primary)'
+                        : 'border-gray-200'
+                    }`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
+                    >
+                      <Image src={iconSrc} alt="" width={18} height={18} />
                     </div>
-                  )}
-                </button>
-              ))}
+                    <span className="font-medium text-gray-800 flex-1 text-xs">
+                      {label}
+                    </span>
+                    {status === key && (
+                      <div className="mr-1 w-4 h-4 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-        {error && (
-          <p role="alert" className="px-6 text-sm text-red-600">
-            {error}
-          </p>
-        )}
-        {/* Footer buttons */}
-        <div className="px-6 py-5 flex justify-end gap-3">
-          {mode === 'edit' && (
-            <button
-              onClick={handleDelete}
-              disabled={isPending}
-              className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-secondary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-            >
-              Delete <Trash2 size={16} />
-            </button>
+          {error && (
+            <p role="alert" className="px-6 text-sm text-red-600">
+              {error}
+            </p>
           )}
-          <button
-            onClick={handleSave}
-            disabled={!name.trim() || isPending}
-            className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-primary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-          >
-            Save <Check size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
+          {/* Footer buttons */}
+          <div className="px-6 py-5 flex justify-end gap-3">
+            {mode === 'edit' && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isPending}
+                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-secondary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              >
+                Delete <Trash2 size={16} />
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={!name.trim() || isPending}
+              className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-primary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            >
+              Save <Check size={16} />
+            </button>
+          </div>
+        </form>
+      </SheetContent>
+    </Sheet>
   );
 }

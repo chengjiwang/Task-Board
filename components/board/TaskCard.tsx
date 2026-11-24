@@ -80,17 +80,21 @@ export default function TaskCard({
   const { card } = STATUS_STYLES[task.status] ?? STATUS_STYLES.todo;
 
   return (
-    <div
-      className={`flex items-center gap-3 p-4 rounded-2xl transition-all ${card} ${
+    <button
+      type="button"
+      className={`flex w-full items-center gap-3 p-4 rounded-2xl text-left transition-all ${card} ${
         disabled
           ? 'opacity-60 pointer-events-none'
           : 'cursor-pointer hover:brightness-95'
       }`}
-      aria-disabled={disabled || undefined}
-      onClick={disabled ? undefined : () => onClick(task)}
+      disabled={disabled}
+      onClick={() => onClick(task)}
     >
       {/* Icon */}
-      <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-xl shrink-0 shadow-sm">
+      <div
+        aria-hidden="true"
+        className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-xl shrink-0 shadow-sm"
+      >
         {ICON_MAP[task.icon]}
       </div>
 
@@ -108,6 +112,6 @@ export default function TaskCard({
 
       {/* Status icon */}
       <StatusIcon status={task.status} />
-    </div>
+    </button>
   );
 }
