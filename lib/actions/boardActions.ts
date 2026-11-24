@@ -86,8 +86,10 @@ export async function deleteBoard(
   }
   try {
     await connectDB();
-    await Board.findByIdAndDelete(boardId);
+    // Delete tasks first: if the second step fails we are left with an empty
+    // (visible, retryable) board rather than invisible orphan tasks.
     await Task.deleteMany({ boardId });
+    await Board.findByIdAndDelete(boardId);
   } catch {
     return { ok: false, error: 'Failed to delete board. Please try again.' };
   }
