@@ -23,11 +23,13 @@ export async function addTask(
   }
   try {
     await connectDB();
-    const maxOrder = await Task.countDocuments({ boardId });
+    // Use max(order) + 1 rather than a count, so deleting tasks never
+    // causes a newly added task to reuse an existing order value.
+    const last = await Task.findOne({ boardId }).sort({ order: -1 }).lean();
     await Task.create({
       ...parsed.data,
       boardId,
-      order: maxOrder,
+      order: last ? last.order + 1 : 0,
     });
   } catch {
     return { ok: false, error: 'Failed to add task. Please try again.' };
