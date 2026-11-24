@@ -8,27 +8,36 @@ import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
 import { TaskInput, TaskUpdateInput } from '../validation';
 
+export type ActionResult = { ok: true } | { ok: false; error: string };
+
 export async function addTask(
   boardId: string,
   data: Pick<ITask, 'name'> &
     Partial<Pick<ITask, 'description' | 'icon' | 'status'>>,
-): Promise<ITask> {
-  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
-  const parsed = TaskInput.parse(data);
-  await connectDB();
-  const maxOrder = await Task.countDocuments({ boardId });
-  const task = await Task.create({
-    ...parsed,
-    boardId,
-    order: maxOrder,
-  });
-  await Board.findByIdAndUpdate(boardId, { $push: { tasks: task._id } });
+): Promise<ActionResult> {
+  if (!isValidObjectId(boardId)) {
+    return { ok: false, error: 'Invalid board ID' };
+  }
+  const parsed = TaskInput.safeParse(data);
+  if (!parsed.success) {
+    return { ok: false, error: 'Invalid task data' };
+  }
+  try {
+    await connectDB();
+    const maxOrder = await Task.countDocuments({ boardId });
+    const task = await Task.create({
+      ...parsed.data,
+      boardId,
+      order: maxOrder,
+    });
+    await Board.findByIdAndUpdate(boardId, { $push: { tasks: task._id } });
+  } catch {
+    return { ok: false, error: 'Failed to add task. Please try again.' };
+  }
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
-  return JSON.parse(JSON.stringify(task));
+  return { ok: true };
 }
-
-export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export async function updateTask(
   taskId: string,

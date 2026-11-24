@@ -107,7 +107,11 @@ export default function TaskDrawer({
         if (onAfterCreate) {
           await onAfterCreate(data);
         } else {
-          await addTask(boardId, data);
+          const res = await addTask(boardId, data);
+          if (!res.ok) {
+            setError(res.error);
+            return;
+          }
         }
       } else if (mode === 'edit' && task) {
         const res = await updateTask(task._id.toString(), data);

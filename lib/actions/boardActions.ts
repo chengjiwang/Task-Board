@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
 import { redirect } from 'next/navigation';
 import { isValidObjectId } from 'mongoose';
+import type { ActionResult } from './taskActions';
 import { BoardInput, BoardUpdateInput } from '../validation';
 
 export async function getBoards(): Promise<IBoard[]> {
@@ -36,21 +37,44 @@ export async function createBoard(
 export async function updateBoard(
   boardId: string,
   data: Partial<Pick<IBoard, 'name' | 'description'>>,
-): Promise<void> {
-  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
-  const parsed = BoardUpdateInput.parse(data);
-  await connectDB();
-  await Board.findByIdAndUpdate(boardId, parsed, { runValidators: true });
+): Promise<ActionResult> {
+  if (!isValidObjectId(boardId)) {
+    return { ok: false, error: 'Invalid board ID' };
+  }
+  const parsed = BoardUpdateInput.safeParse(data);
+  if (!parsed.success) {
+    return { ok: false, error: 'Invalid board data' };
+  }
+  try {
+    await connectDB();
+    const board = await Board.findByIdAndUpdate(boardId, parsed.data, {
+      runValidators: true,
+    });
+    if (!board) {
+      return { ok: false, error: 'Board not found. It may have been deleted.' };
+    }
+  } catch {
+    return { ok: false, error: 'Failed to update board. Please try again.' };
+  }
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
+  return { ok: true };
 }
 
-export async function deleteBoard(boardId: string): Promise<void> {
-  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
-  await connectDB();
-  await Board.findByIdAndDelete(boardId);
-  await Task.deleteMany({ boardId });
-
+// On success this redirects to '/' (never returns); it only returns on failure.
+export async function deleteBoard(
+  boardId: string,
+): Promise<ActionResult | undefined> {
+  if (!isValidObjectId(boardId)) {
+    return { ok: false, error: 'Invalid board ID' };
+  }
+  try {
+    await connectDB();
+    await Board.findByIdAndDelete(boardId);
+    await Task.deleteMany({ boardId });
+  } catch {
+    return { ok: false, error: 'Failed to delete board. Please try again.' };
+  }
   revalidatePath('/');
   redirect('/'); // Redirect to home after deletion to avoid showing a now-nonexistent board page
 }
