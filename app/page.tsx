@@ -1,4 +1,4 @@
-import { getBoards } from '@/lib/actions/boardActions';
+import { getBoards } from '@/lib/data/boards';
 import BoardListPage from '@/components/boards/BoardListPage';
 
 export default async function Home() {

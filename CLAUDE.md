@@ -26,7 +26,7 @@ Requires `MONGODB_URI` in `.env.local` (`.env*` is gitignored). `connectDB()` th
 
 ## Architecture
 
-**No API routes — all data access goes through Server Actions** in [lib/actions/](lib/actions/) (`'use server'`). Server Components call them directly to read (`getBoards`, `getBoard`); Client Components import and call them to mutate.
+**No API routes — mutations go through Server Actions** in [lib/actions/](lib/actions/) (`'use server'`), called from Client Components. Reads (`getBoards`, `getBoard`) live in [lib/data/boards.ts](lib/data/boards.ts) with `import 'server-only'` and are called only by Server Components; they must NOT go in a `'use server'` file, or they would be exposed as public endpoints.
 
 - Every action starts with `await connectDB()` ([lib/mongodb.ts](lib/mongodb.ts)), which caches the Mongoose connection on `global.mongoose` to survive hot reload / serverless reuse.
 - Results returned to the client are passed through `JSON.parse(JSON.stringify(...))` to strip ObjectIds/Dates into plain serializable values. Keep doing this for anything returned from an action or passed from a Server to a Client Component.
