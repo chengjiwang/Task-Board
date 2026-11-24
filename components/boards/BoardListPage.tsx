@@ -1,9 +1,9 @@
-import type { IBoard } from '@/types';
+import type { IBoardWithCount } from '@/types';
 import BoardCard from './BoardCard';
 import CreateBoardButton from './CreateBoardButton';
 
 interface BoardListPageProps {
-  boards: IBoard[];
+  boards: IBoardWithCount[];
 }
 
 export default function BoardListPage({ boards }: BoardListPageProps) {

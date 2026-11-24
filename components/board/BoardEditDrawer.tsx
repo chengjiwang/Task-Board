@@ -20,7 +20,7 @@ import { unstable_rethrow, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface BoardEditDrawerProps {
-  board: IBoard;
+  board: Pick<IBoard, '_id' | 'name' | 'description'>;
   isOpen: boolean;
   onClose: () => void;
 }

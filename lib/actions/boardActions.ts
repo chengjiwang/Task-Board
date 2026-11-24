@@ -2,7 +2,7 @@
 
 import Board from '@/models/Board';
 import Task from '@/models/Task';
-import type { IBoard } from '@/types';
+import type { IBoard, IBoardWithCount, IBoardWithTasks } from '@/types';
 import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
 import { redirect } from 'next/navigation';
@@ -10,18 +10,34 @@ import { isValidObjectId } from 'mongoose';
 import type { ActionResult } from './taskActions';
 import { BoardInput, BoardUpdateInput } from '../validation';
 
-export async function getBoards(): Promise<IBoard[]> {
+export async function getBoards(): Promise<IBoardWithCount[]> {
   await connectDB();
-  const boards = await Board.find().sort({ createdAt: -1 }).lean();
-  return JSON.parse(JSON.stringify(boards));
+  const [boards, counts] = await Promise.all([
+    Board.find().sort({ createdAt: -1 }).lean(),
+    Task.aggregate<{ _id: unknown; count: number }>([
+      { $group: { _id: '$boardId', count: { $sum: 1 } } },
+    ]),
+  ]);
+  const countByBoard = new Map(counts.map((c) => [String(c._id), c.count]));
+  const result = boards.map((board) => ({
+    ...board,
+    taskCount: countByBoard.get(String(board._id)) ?? 0,
+  }));
+  return JSON.parse(JSON.stringify(result));
 }
 
-export async function getBoard(boardId: string): Promise<IBoard | null> {
+export async function getBoard(
+  boardId: string,
+): Promise<IBoardWithTasks | null> {
   if (!/^[0-9a-f]{24}$/i.test(boardId)) return null;
   await connectDB();
-  const board = await Board.findById(boardId).populate('tasks').lean();
+  const board = await Board.findById(boardId).lean();
   if (!board) return null;
-  return JSON.parse(JSON.stringify(board));
+  // createdAt as tiebreaker: legacy data may contain duplicate `order` values
+  const tasks = await Task.find({ boardId })
+    .sort({ order: 1, createdAt: 1 })
+    .lean();
+  return JSON.parse(JSON.stringify({ ...board, tasks }));
 }
 
 export async function createBoard(

@@ -1,10 +1,10 @@
 'use client';
 
-import type { IBoard } from '@/types';
+import type { IBoardWithCount } from '@/types';
 import Link from 'next/link';
 
 interface BoardCardProps {
-  board: IBoard;
+  board: IBoardWithCount;
 }
 
 export default function BoardCard({ board }: BoardCardProps) {
@@ -36,7 +36,7 @@ export default function BoardCard({ board }: BoardCardProps) {
 
         <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
           <span>
-            {board.tasks.length} task{board.tasks.length !== 1 ? 's' : ''}
+            {board.taskCount} task{board.taskCount !== 1 ? 's' : ''}
           </span>
           <span>{formatDate(board.createdAt)}</span>
         </div>
