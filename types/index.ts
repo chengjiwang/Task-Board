@@ -14,8 +14,6 @@ export interface IBoard {
   _id: Types.ObjectId | string;
   name: string;
   description?: string;
-  /** @deprecated legacy field, no longer read; removed in the next step */
-  tasks?: (Types.ObjectId | string)[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,10 +30,10 @@ export interface ITask {
   updatedAt: Date;
 }
 
-export interface IBoardWithTasks extends Omit<IBoard, 'tasks'> {
+export interface IBoardWithTasks extends IBoard {
   tasks: ITask[];
 }
 
-export interface IBoardWithCount extends Omit<IBoard, 'tasks'> {
+export interface IBoardWithCount extends IBoard {
   taskCount: number;
 }

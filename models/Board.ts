@@ -12,12 +12,6 @@ const BoardSchema = new Schema<IBoard>(
       type: String,
       default: 'Tasks to keep organised',
     },
-    tasks: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Task',
-      },
-    ],
   },
   { timestamps: true },
 );
