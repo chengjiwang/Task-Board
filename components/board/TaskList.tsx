@@ -63,6 +63,7 @@ export default function TaskList({
             key={task._id.toString()}
             task={task}
             onClick={onTaskClick}
+            disabled={task._id.toString().startsWith('temp-')}
           />
         ))}
         <AddTaskButton onClick={() => setCreateDrawerOpen(true)} />
