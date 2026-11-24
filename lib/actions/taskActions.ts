@@ -1,6 +1,5 @@
 'use server';
 
-import Board from '@/models/Board';
 import Task from '@/models/Task';
 import type { ITask } from '@/types';
 import { isValidObjectId } from 'mongoose';
@@ -24,13 +23,14 @@ export async function addTask(
   }
   try {
     await connectDB();
-    const maxOrder = await Task.countDocuments({ boardId });
-    const task = await Task.create({
+    // Use max(order) + 1 rather than a count, so deleting tasks never
+    // causes a newly added task to reuse an existing order value.
+    const last = await Task.findOne({ boardId }).sort({ order: -1 }).lean();
+    await Task.create({
       ...parsed.data,
       boardId,
-      order: maxOrder,
+      order: last ? last.order + 1 : 0,
     });
-    await Board.findByIdAndUpdate(boardId, { $push: { tasks: task._id } });
   } catch {
     return { ok: false, error: 'Failed to add task. Please try again.' };
   }
@@ -71,7 +71,6 @@ export async function deleteTask(
   }
   await connectDB();
   await Task.findByIdAndDelete(taskId);
-  await Board.findByIdAndUpdate(boardId, { $pull: { tasks: taskId } });
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
   return { ok: true };

@@ -14,7 +14,6 @@ export interface IBoard {
   _id: Types.ObjectId | string;
   name: string;
   description?: string;
-  tasks: (Types.ObjectId | string)[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,4 +28,12 @@ export interface ITask {
   order: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IBoardWithTasks extends IBoard {
+  tasks: ITask[];
+}
+
+export interface IBoardWithCount extends IBoard {
+  taskCount: number;
 }

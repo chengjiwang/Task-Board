@@ -4,18 +4,18 @@ import BoardEditDrawer from '@/components/board/BoardEditDrawer';
 import BoardHeader from '@/components/board/BoardHeader';
 import TaskList from '@/components/board/TaskList';
 import TaskDrawer from '@/components/task/TaskDrawer';
-import type { IBoard, ITask } from '@/types';
+import type { IBoardWithTasks, ITask } from '@/types';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
 interface BoardMainProps {
-  board: IBoard;
+  board: IBoardWithTasks;
 }
 
 export default function BoardMain({ board }: BoardMainProps) {
   const boardId = board._id.toString();
-  const tasks = board.tasks as unknown as ITask[];
+  const tasks = board.tasks;
 
   // TaskDrawer (edit mode)
   const [editTaskDrawerOpen, setEditTaskDrawerOpen] = useState(false);
