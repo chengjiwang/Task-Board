@@ -69,15 +69,25 @@ function StatusIcon({ status }: { status: TaskStatus }) {
 interface TaskCardProps {
   task: ITask;
   onClick: (task: ITask) => void;
+  disabled?: boolean;
 }
 
-export default function TaskCard({ task, onClick }: TaskCardProps) {
+export default function TaskCard({
+  task,
+  onClick,
+  disabled = false,
+}: TaskCardProps) {
   const { card } = STATUS_STYLES[task.status] ?? STATUS_STYLES.todo;
 
   return (
     <div
-      className={`flex items-center gap-3 p-4 rounded-2xl cursor-pointer hover:brightness-95 transition-all ${card}`}
-      onClick={() => onClick(task)}
+      className={`flex items-center gap-3 p-4 rounded-2xl transition-all ${card} ${
+        disabled
+          ? 'opacity-60 pointer-events-none'
+          : 'cursor-pointer hover:brightness-95'
+      }`}
+      aria-disabled={disabled || undefined}
+      onClick={disabled ? undefined : () => onClick(task)}
     >
       {/* Icon */}
       <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-xl shrink-0 shadow-sm">
