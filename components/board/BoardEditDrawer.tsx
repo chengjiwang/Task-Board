@@ -15,7 +15,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { deleteBoard, updateBoard } from '@/lib/actions/boardActions';
 import type { IBoard } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { unstable_rethrow, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface BoardEditDrawerProps {
@@ -47,14 +48,20 @@ export default function BoardEditDrawer({
     if (!name.trim()) return;
     setIsPending(true);
     try {
-      await updateBoard(board._id.toString(), {
+      const res = await updateBoard(board._id.toString(), {
         name: name.trim(),
         description: description.trim(),
       });
-      
+
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
       router.prefetch('/');
       router.refresh();
       onClose();
+    } catch {
+      toast.error('Failed to update board. Please try again.');
     } finally {
       setIsPending(false);
     }
@@ -67,7 +74,20 @@ export default function BoardEditDrawer({
 
   const handleConfirmDelete = async () => {
     setIsPending(true);
-    await deleteBoard(board._id.toString());
+    try {
+      const res = await deleteBoard(board._id.toString());
+      if (res && !res.ok) {
+        toast.error(res.error);
+        setIsPending(false);
+      }
+    } catch (e) {
+      // On success, deleteBoard calls redirect('/'), and Next.js rejects the
+      // action promise with a redirect error so the router can navigate.
+      // Re-throw it instead of treating it as a failure.
+      unstable_rethrow(e);
+      toast.error('Failed to delete board. Please try again.');
+      setIsPending(false);
+    }
   };
 
   if (!isOpen) return null;
