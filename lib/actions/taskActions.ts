@@ -6,18 +6,21 @@ import type { ITask } from '@/types';
 import { isValidObjectId } from 'mongoose';
 import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
+import { TaskInput, TaskUpdateInput } from '../validation';
 
 export async function addTask(
   boardId: string,
   data: Pick<ITask, 'name'> &
     Partial<Pick<ITask, 'description' | 'icon' | 'status'>>,
 ): Promise<ITask> {
+  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
+  const parsed = TaskInput.parse(data);
   await connectDB();
   const maxOrder = await Task.countDocuments({ boardId });
   const task = await Task.create({
+    ...parsed,
     boardId,
     order: maxOrder,
-    ...data,
   });
   await Board.findByIdAndUpdate(boardId, { $push: { tasks: task._id } });
   revalidatePath(`/board/${boardId}`);
@@ -34,8 +37,12 @@ export async function updateTask(
   if (!isValidObjectId(taskId)) {
     return { ok: false, error: 'Invalid task ID' };
   }
+  const parsed = TaskUpdateInput.safeParse(data);
+  if (!parsed.success) {
+    return { ok: false, error: 'Invalid task data' };
+  }
   await connectDB();
-  const task = await Task.findByIdAndUpdate(taskId, data, {
+  const task = await Task.findByIdAndUpdate(taskId, parsed.data, {
     new: true,
     runValidators: true,
   });

@@ -6,6 +6,8 @@ import type { IBoard } from '@/types';
 import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
 import { redirect } from 'next/navigation';
+import { isValidObjectId } from 'mongoose';
+import { BoardInput, BoardUpdateInput } from '../validation';
 
 export async function getBoards(): Promise<IBoard[]> {
   await connectDB();
@@ -24,8 +26,9 @@ export async function getBoard(boardId: string): Promise<IBoard | null> {
 export async function createBoard(
   data: Pick<IBoard, 'name'> & Partial<Pick<IBoard, 'description'>>,
 ): Promise<string> {
+  const parsed = BoardInput.parse(data);
   await connectDB();
-  const board = await Board.create(data);
+  const board = await Board.create(parsed);
   revalidatePath('/');
   return board._id.toString();
 }
@@ -34,13 +37,16 @@ export async function updateBoard(
   boardId: string,
   data: Partial<Pick<IBoard, 'name' | 'description'>>,
 ): Promise<void> {
+  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
+  const parsed = BoardUpdateInput.parse(data);
   await connectDB();
-  await Board.findByIdAndUpdate(boardId, data, { runValidators: true });
+  await Board.findByIdAndUpdate(boardId, parsed, { runValidators: true });
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
 }
 
 export async function deleteBoard(boardId: string): Promise<void> {
+  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
   await connectDB();
   await Board.findByIdAndDelete(boardId);
   await Task.deleteMany({ boardId });
