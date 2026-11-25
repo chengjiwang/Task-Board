@@ -11,17 +11,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { deleteBoard, updateBoard } from '@/lib/actions/boardActions';
 import type { IBoard } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { unstable_rethrow, useRouter } from 'next/navigation';
+import { unstable_rethrow } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
 
 interface BoardEditDrawerProps {
@@ -35,7 +31,6 @@ export default function BoardEditDrawer({
   isOpen,
   onClose,
 }: BoardEditDrawerProps) {
-  const router = useRouter();
   const uid = useId();
   const nameId = `${uid}-name`;
   const descId = `${uid}-description`;
@@ -66,8 +61,6 @@ export default function BoardEditDrawer({
         toast.error(res.error);
         return;
       }
-      router.prefetch('/');
-      router.refresh();
       onClose();
     } catch {
       toast.error('Failed to update board. Please try again.');
