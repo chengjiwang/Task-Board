@@ -1,5 +1,5 @@
 import type { IBoard } from '@/types';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, type Model } from 'mongoose';
 
 const BoardSchema = new Schema<IBoard>(
   {
@@ -17,6 +17,7 @@ const BoardSchema = new Schema<IBoard>(
 );
 
 const Board =
-  mongoose.models.Board || mongoose.model<IBoard>('Board', BoardSchema);
+  (mongoose.models.Board as Model<IBoard>) ||
+  mongoose.model<IBoard>('Board', BoardSchema);
 
 export default Board;

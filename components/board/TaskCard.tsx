@@ -1,67 +1,17 @@
 'use client';
 
-import type { ITask, TaskIcon, TaskStatus } from '@/types';
+import { ICON_EMOJI, STATUS_META } from '@/lib/constants';
+import type { ITask, TaskStatus } from '@/types';
 import Image from 'next/image';
 
-const ICON_MAP: Record<TaskIcon, string> = {
-  clock: '⏰',
-  bubble: '💬',
-  coffee: '☕',
-  workout: '🏋️‍♂️',
-  stack: '📚',
-  person: '🧑‍💻',
-};
-
-const STATUS_STYLES: Record<
-  TaskStatus,
-  { card: string; iconBg: string | null }
-> = {
-  todo: { card: 'bg-[var(--color-todo-bg)]', iconBg: null },
-  in_progress: {
-    card: 'bg-(--color-in-progress-bg)',
-    iconBg: 'bg-(--color-in-progress-icon)',
-  },
-  completed: {
-    card: 'bg-(--color-completed-bg)',
-    iconBg: 'bg-(--color-completed-icon)',
-  },
-  wont_do: {
-    card: 'bg-(--color-wont-do-bg)',
-    iconBg: 'bg-(--color-wont-do-icon)',
-  },
-};
-
 function StatusIcon({ status }: { status: TaskStatus }) {
-  if (status === 'todo') return null;
-  const { iconBg } = STATUS_STYLES[status] ?? STATUS_STYLES.todo;
+  const { iconBg, iconSrc, label } = STATUS_META[status] ?? STATUS_META.todo;
+  if (!iconBg || !iconSrc) return null;
   return (
     <div
       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}
     >
-      {status === 'in_progress' && (
-        <Image
-          src="/icons/time_atack_duotone.svg"
-          alt="in progress"
-          width={20}
-          height={20}
-        />
-      )}
-      {status === 'completed' && (
-        <Image
-          src="/icons/done_round_duotone.svg"
-          alt="completed"
-          width={20}
-          height={20}
-        />
-      )}
-      {status === 'wont_do' && (
-        <Image
-          src="/icons/close_ring_duotone.svg"
-          alt="wont do"
-          width={20}
-          height={20}
-        />
-      )}
+      <Image src={iconSrc} alt={label} width={20} height={20} />
     </div>
   );
 }
@@ -77,12 +27,12 @@ export default function TaskCard({
   onClick,
   disabled = false,
 }: TaskCardProps) {
-  const { card } = STATUS_STYLES[task.status] ?? STATUS_STYLES.todo;
+  const { cardBg } = STATUS_META[task.status] ?? STATUS_META.todo;
 
   return (
     <button
       type="button"
-      className={`flex w-full items-center gap-3 p-4 rounded-2xl text-left transition-all ${card} ${
+      className={`flex w-full items-center gap-3 p-4 rounded-2xl text-left transition-all ${cardBg} ${
         disabled
           ? 'opacity-60 pointer-events-none'
           : 'cursor-pointer hover:brightness-95'
@@ -95,7 +45,7 @@ export default function TaskCard({
         aria-hidden="true"
         className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-xl shrink-0 shadow-sm"
       >
-        {ICON_MAP[task.icon]}
+        {ICON_EMOJI[task.icon]}
       </div>
 
       {/* Content */}

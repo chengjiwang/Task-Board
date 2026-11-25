@@ -1,15 +1,5 @@
 import { z } from 'zod';
-
-// Keep in sync with the Mongoose schema enums and the TaskIcon / TaskStatus types.
-const TASK_ICONS = [
-  'clock',
-  'bubble',
-  'coffee',
-  'workout',
-  'stack',
-  'person',
-] as const;
-const TASK_STATUSES = ['todo', 'in_progress', 'completed', 'wont_do'] as const;
+import { TASK_ICONS, TASK_STATUSES } from '@/lib/constants';
 
 // z.object strips unknown keys, so these schemas double as a field whitelist
 // (boardId / order / _id / tasks can never be injected through `data`).

@@ -1,5 +1,6 @@
+import { TASK_ICONS, TASK_STATUSES } from '@/lib/constants';
 import type { ITask } from '@/types';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, type Model } from 'mongoose';
 
 const TaskSchema = new Schema<ITask>(
   {
@@ -18,12 +19,12 @@ const TaskSchema = new Schema<ITask>(
     },
     icon: {
       type: String,
-      enum: ['clock', 'bubble', 'coffee', 'workout', 'stack', 'person'],
+      enum: TASK_ICONS,
       default: 'stack',
     },
     status: {
       type: String,
-      enum: ['todo', 'in_progress', 'completed', 'wont_do'],
+      enum: TASK_STATUSES,
       default: 'todo',
     },
     order: {
@@ -36,6 +37,8 @@ const TaskSchema = new Schema<ITask>(
 
 TaskSchema.index({ boardId: 1, order: 1 });
 
-const Task = mongoose.models.Task || mongoose.model<ITask>('Task', TaskSchema);
+const Task =
+  (mongoose.models.Task as Model<ITask>) ||
+  mongoose.model<ITask>('Task', TaskSchema);
 
 export default Task;

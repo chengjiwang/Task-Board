@@ -11,18 +11,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { deleteBoard, updateBoard } from '@/lib/actions/boardActions';
 import type { IBoard } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { unstable_rethrow, useRouter } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { unstable_rethrow } from 'next/navigation';
+import { useId, useState } from 'react';
 
 interface BoardEditDrawerProps {
   board: Pick<IBoard, '_id' | 'name' | 'description'>;
@@ -31,26 +27,32 @@ interface BoardEditDrawerProps {
 }
 
 export default function BoardEditDrawer({
-  board,
   isOpen,
   onClose,
+  board,
 }: BoardEditDrawerProps) {
-  const router = useRouter();
+  return (
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent aria-describedby={undefined}>
+        {/* The form only mounts while the sheet is open, so its state is
+            initialised from props on every open — no effect needed. */}
+        <BoardEditForm board={board} onClose={onClose} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function BoardEditForm({
+  board,
+  onClose,
+}: Omit<BoardEditDrawerProps, 'isOpen'>) {
   const uid = useId();
   const nameId = `${uid}-name`;
   const descId = `${uid}-description`;
   const [showAlert, setShowAlert] = useState(false);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState(board.name);
+  const [description, setDescription] = useState(board.description ?? '');
   const [isPending, setIsPending] = useState(false);
-
-  // Sync form when drawer opens
-  useEffect(() => {
-    if (isOpen) {
-      setName(board.name);
-      setDescription(board.description ?? '');
-    }
-  }, [isOpen, board]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,8 +68,6 @@ export default function BoardEditDrawer({
         toast.error(res.error);
         return;
       }
-      router.prefetch('/');
-      router.refresh();
       onClose();
     } catch {
       toast.error('Failed to update board. Please try again.');
@@ -101,8 +101,6 @@ export default function BoardEditDrawer({
 
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <SheetContent aria-describedby={undefined}>
           {/* loading overlay */}
           {isPending && (
             <div className="absolute inset-0 z-20 bg-white/80 flex flex-col items-center justify-center gap-3">
@@ -168,7 +166,7 @@ export default function BoardEditDrawer({
                 type="button"
                 onClick={handleDelete}
                 disabled={isPending}
-                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-secondary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-action-secondary hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
               >
                 Delete <Trash2 size={16} />
               </button>
@@ -177,15 +175,12 @@ export default function BoardEditDrawer({
               <button
                 type="submit"
                 disabled={isPending || !name.trim()}
-                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-primary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-action-primary hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
               >
                 Save <Check size={16} />
               </button>
             </div>
           </form>
-        </SheetContent>
-      </Sheet>
-
       <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
