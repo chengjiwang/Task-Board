@@ -1,3 +1,4 @@
+import { TASK_ICONS, TASK_STATUSES } from '@/lib/constants';
 import type { ITask } from '@/types';
 import mongoose, { Schema } from 'mongoose';
 
@@ -18,12 +19,12 @@ const TaskSchema = new Schema<ITask>(
     },
     icon: {
       type: String,
-      enum: ['clock', 'bubble', 'coffee', 'workout', 'stack', 'person'],
+      enum: TASK_ICONS,
       default: 'stack',
     },
     status: {
       type: String,
-      enum: ['todo', 'in_progress', 'completed', 'wont_do'],
+      enum: TASK_STATUSES,
       default: 'todo',
     },
     order: {

@@ -1,53 +1,20 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { addTask, deleteTask, updateTask } from '@/lib/actions/taskActions';
+import {
+  ICON_EMOJI,
+  SELECTABLE_STATUSES,
+  STATUS_META,
+  TASK_ICONS,
+} from '@/lib/constants';
 import type { ITask, TaskIcon, TaskStatus } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
-
-const ICONS: { key: TaskIcon; emoji: string }[] = [
-  { key: 'person', emoji: '🧑‍💻' },
-  { key: 'bubble', emoji: '💬' },
-  { key: 'coffee', emoji: '☕' },
-  { key: 'workout', emoji: '🏋️‍♂️' },
-  { key: 'stack', emoji: '📚' },
-  { key: 'clock', emoji: '⏰' },
-];
-
-const STATUS_OPTIONS: {
-  key: TaskStatus;
-  label: string;
-  iconBg: string;
-  iconSrc: string;
-}[] = [
-  {
-    key: 'in_progress',
-    label: 'In Progress',
-    iconBg: 'bg-in-progress-icon',
-    iconSrc: '/icons/time_atack_duotone.svg',
-  },
-  {
-    key: 'completed',
-    label: 'Completed',
-    iconBg: 'bg-completed-icon',
-    iconSrc: '/icons/done_round_duotone.svg',
-  },
-  {
-    key: 'wont_do',
-    label: "Won't Do",
-    iconBg: 'bg-wont-do-icon',
-    iconSrc: '/icons/close_ring_duotone.svg',
-  },
-];
 
 interface TaskDrawerProps {
   mode: 'create' | 'edit';
@@ -221,7 +188,7 @@ export default function TaskDrawer({
                 Icon
               </span>
               <div className="flex gap-2 flex-wrap">
-                {ICONS.map(({ key, emoji }) => (
+                {TASK_ICONS.map((key) => (
                   <button
                     key={key}
                     type="button"
@@ -234,7 +201,7 @@ export default function TaskDrawer({
                         : 'bg-icon-bg-unselected hover:bg-icon-bg-selected'
                     }`}
                   >
-                    {emoji}
+                    {ICON_EMOJI[key]}
                   </button>
                 ))}
               </div>
@@ -249,33 +216,36 @@ export default function TaskDrawer({
                 Status
               </span>
               <div className="grid grid-cols-2 gap-2">
-                {STATUS_OPTIONS.map(({ key, label, iconBg, iconSrc }) => (
-                  <button
-                    key={key}
-                    type="button"
-                    aria-pressed={status === key}
-                    onClick={() => toggleStatus(key)}
-                    className={`flex items-center gap-2 px-0.5 py-0.5 rounded-xl border-2 transition-colors text-left cursor-pointer bg-white ${
-                      status === key
-                        ? 'border-(--color-action-primary)'
-                        : 'border-gray-200'
-                    }`}
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
+                {SELECTABLE_STATUSES.map((key) => {
+                  const { label, iconBg, iconSrc } = STATUS_META[key];
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      aria-pressed={status === key}
+                      onClick={() => toggleStatus(key)}
+                      className={`flex items-center gap-2 px-0.5 py-0.5 rounded-xl border-2 transition-colors text-left cursor-pointer bg-white ${
+                        status === key
+                          ? 'border-(--color-action-primary)'
+                          : 'border-gray-200'
+                      }`}
                     >
-                      <Image src={iconSrc} alt="" width={18} height={18} />
-                    </div>
-                    <span className="font-medium text-gray-800 flex-1 text-xs">
-                      {label}
-                    </span>
-                    {status === key && (
-                      <div className="mr-1 w-4 h-4 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
-                        <Check size={12} className="text-white" />
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}
+                      >
+                        <Image src={iconSrc!} alt="" width={18} height={18} />
                       </div>
-                    )}
-                  </button>
-                ))}
+                      <span className="font-medium text-gray-800 flex-1 text-xs">
+                        {label}
+                      </span>
+                      {status === key && (
+                        <div className="mr-1 w-4 h-4 rounded-full bg-(--color-action-primary) flex items-center justify-center shrink-0">
+                          <Check size={12} className="text-white" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
