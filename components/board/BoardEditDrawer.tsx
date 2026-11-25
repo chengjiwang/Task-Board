@@ -166,7 +166,7 @@ function BoardEditForm({
                 type="button"
                 onClick={handleDelete}
                 disabled={isPending}
-                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-secondary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-action-secondary hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
               >
                 Delete <Trash2 size={16} />
               </button>
@@ -175,7 +175,7 @@ function BoardEditForm({
               <button
                 type="submit"
                 disabled={isPending || !name.trim()}
-                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-(--color-action-primary) hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                className="px-4 py-1.5 rounded-full text-sm font-medium text-white bg-action-primary hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
               >
                 Save <Check size={16} />
               </button>
