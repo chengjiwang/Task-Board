@@ -14,7 +14,7 @@ import type { ITask, TaskIcon, TaskStatus } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 
 interface TaskDrawerProps {
   mode: 'create' | 'edit';
@@ -32,41 +32,41 @@ interface TaskDrawerProps {
 }
 
 export default function TaskDrawer({
+  isOpen,
+  onClose,
+  ...formProps
+}: TaskDrawerProps) {
+  return (
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent aria-describedby={undefined}>
+        {/* The form only mounts while the sheet is open, so its state is
+            initialised from props on every open — no effect needed. */}
+        <TaskDrawerForm onClose={onClose} {...formProps} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+type TaskDrawerFormProps = Omit<TaskDrawerProps, 'isOpen'>;
+
+function TaskDrawerForm({
   mode,
   task,
   boardId,
-  isOpen,
   onClose,
   onAfterCreate,
-}: TaskDrawerProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [icon, setIcon] = useState<TaskIcon>('person');
-  const [status, setStatus] = useState<TaskStatus>('todo');
+}: TaskDrawerFormProps) {
+  const initial = mode === 'edit' ? task : undefined;
+  const [name, setName] = useState(initial?.name ?? '');
+  const [description, setDescription] = useState(initial?.description ?? '');
+  const [icon, setIcon] = useState<TaskIcon>(initial?.icon ?? 'person');
+  const [status, setStatus] = useState<TaskStatus>(initial?.status ?? 'todo');
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const uid = useId();
   const nameId = `${uid}-name`;
   const descId = `${uid}-description`;
-
-  // Sync form when drawer opens
-  useEffect(() => {
-    if (isOpen) {
-      setError(null);
-      if (mode === 'edit' && task) {
-        setName(task.name);
-        setDescription(task.description ?? '');
-        setIcon(task.icon);
-        setStatus(task.status);
-      } else {
-        setName('');
-        setDescription('');
-        setIcon('person');
-        setStatus('todo');
-      }
-    }
-  }, [isOpen, mode, task]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,8 +127,7 @@ export default function TaskDrawer({
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent aria-describedby={undefined}>
+    <>
         {/* Header */}
         <div className="flex items-center justify-between p-6 pb-2">
           <SheetTitle>
@@ -275,7 +274,6 @@ export default function TaskDrawer({
             </button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+    </>
   );
 }

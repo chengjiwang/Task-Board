@@ -18,7 +18,7 @@ import type { IBoard } from '@/types';
 import { Check, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { unstable_rethrow } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 
 interface BoardEditDrawerProps {
   board: Pick<IBoard, '_id' | 'name' | 'description'>;
@@ -27,25 +27,32 @@ interface BoardEditDrawerProps {
 }
 
 export default function BoardEditDrawer({
-  board,
   isOpen,
   onClose,
+  board,
 }: BoardEditDrawerProps) {
+  return (
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent aria-describedby={undefined}>
+        {/* The form only mounts while the sheet is open, so its state is
+            initialised from props on every open — no effect needed. */}
+        <BoardEditForm board={board} onClose={onClose} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function BoardEditForm({
+  board,
+  onClose,
+}: Omit<BoardEditDrawerProps, 'isOpen'>) {
   const uid = useId();
   const nameId = `${uid}-name`;
   const descId = `${uid}-description`;
   const [showAlert, setShowAlert] = useState(false);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState(board.name);
+  const [description, setDescription] = useState(board.description ?? '');
   const [isPending, setIsPending] = useState(false);
-
-  // Sync form when drawer opens
-  useEffect(() => {
-    if (isOpen) {
-      setName(board.name);
-      setDescription(board.description ?? '');
-    }
-  }, [isOpen, board]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,8 +101,6 @@ export default function BoardEditDrawer({
 
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <SheetContent aria-describedby={undefined}>
           {/* loading overlay */}
           {isPending && (
             <div className="absolute inset-0 z-20 bg-white/80 flex flex-col items-center justify-center gap-3">
@@ -176,9 +181,6 @@ export default function BoardEditDrawer({
               </button>
             </div>
           </form>
-        </SheetContent>
-      </Sheet>
-
       <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
