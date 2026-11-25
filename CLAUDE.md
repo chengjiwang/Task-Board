@@ -26,14 +26,14 @@ Requires `MONGODB_URI` in `.env.local` (`.env*` is gitignored). `connectDB()` th
 
 ## Architecture
 
-**No API routes — all data access goes through Server Actions** in [lib/actions/](lib/actions/) (`'use server'`). Server Components call them directly to read (`getBoards`, `getBoard`); Client Components import and call them to mutate.
+**No API routes — mutations go through Server Actions** in [lib/actions/](lib/actions/) (`'use server'`), called from Client Components. Reads (`getBoards`, `getBoard`) live in [lib/data/boards.ts](lib/data/boards.ts) with `import 'server-only'` and are called only by Server Components; they must NOT go in a `'use server'` file, or they would be exposed as public endpoints.
 
 - Every action starts with `await connectDB()` ([lib/mongodb.ts](lib/mongodb.ts)), which caches the Mongoose connection on `global.mongoose` to survive hot reload / serverless reuse.
 - Results returned to the client are passed through `JSON.parse(JSON.stringify(...))` to strip ObjectIds/Dates into plain serializable values. Keep doing this for anything returned from an action or passed from a Server to a Client Component.
 - After mutations, actions call `revalidatePath` for `/board/${boardId}` and/or `/`. When adding a mutation, revalidate every page whose data it affects (the home page shows board info, so board/task count changes revalidate `/` too).
 - `deleteBoard` cascades to delete its tasks and then `redirect('/')`.
 
-**Data model** ([models/](models/), types in [types/index.ts](types/index.ts)): the Board↔Task relation is stored **in both directions** — `Task.boardId` and `Board.tasks: ObjectId[]`. `getBoard` uses `.populate('tasks')`, so `board.tasks` is actually `ITask[]` at runtime (cast in `BoardMain`). Task add/delete must keep `Board.tasks` in sync (`$push` / `$pull`). Models use the `mongoose.models.X || mongoose.model(...)` pattern to avoid recompilation errors.
+**Data model** ([models/](models/), types in [types/index.ts](types/index.ts)): the Board↔Task relation is stored **only on the Task side** (`Task.boardId`); `Board` has no `tasks` field. `getBoard` queries `Task.find({ boardId }).sort({ order: 1, createdAt: 1 })` and returns `IBoardWithTasks` (board + `tasks: ITask[]`); `getBoards` aggregates per-board counts and returns `IBoardWithCount` (board + `taskCount`). New tasks get `order = max(order) + 1` within their board. Models use the `mongoose.models.X || mongoose.model(...)` pattern to avoid recompilation errors.
 
 Task `icon` and `status` are string enums defined in three places that must stay consistent: the Mongoose schema enum, the TS union types, and the `ICONS` / `STATUS_OPTIONS` arrays in [components/task/TaskDrawer.tsx](components/task/TaskDrawer.tsx).
 

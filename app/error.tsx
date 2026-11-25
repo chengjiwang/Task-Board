@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 
 interface ErrorProps {
-  error: Error;
+  error: Error & { digest?: string };
   reset: () => void;
 }
 
-export default function Error({ error, reset }: ErrorProps) {
+export default function ErrorPage({ error, reset }: ErrorProps) {
   useEffect(() => {
     console.error(error);
   }, [error]);

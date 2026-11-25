@@ -1,20 +1,12 @@
+import type { TaskIcon, TaskStatus } from '@/lib/constants';
 import { Types } from 'mongoose';
 
-export type TaskIcon =
-  | 'clock'
-  | 'bubble'
-  | 'coffee'
-  | 'workout'
-  | 'stack'
-  | 'person';
-
-export type TaskStatus = 'todo' | 'in_progress' | 'completed' | 'wont_do';
+export type { TaskIcon, TaskStatus } from '@/lib/constants';
 
 export interface IBoard {
   _id: Types.ObjectId | string;
   name: string;
   description?: string;
-  tasks: (Types.ObjectId | string)[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,4 +21,12 @@ export interface ITask {
   order: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IBoardWithTasks extends IBoard {
+  tasks: ITask[];
+}
+
+export interface IBoardWithCount extends IBoard {
+  taskCount: number;
 }

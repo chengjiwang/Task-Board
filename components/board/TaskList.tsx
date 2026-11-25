@@ -5,6 +5,7 @@ import TaskCard from '@/components/board/TaskCard';
 import TaskDrawer from '@/components/task/TaskDrawer';
 import { addTask } from '@/lib/actions/taskActions';
 import type { ITask, TaskIcon, TaskStatus } from '@/types';
+import { toast } from 'sonner';
 import { startTransition, useOptimistic, useState } from 'react';
 
 interface TaskListProps {
@@ -40,7 +41,12 @@ export default function TaskList({
     };
     startTransition(async () => {
       addOptimisticTask(tempTask);
-      await addTask(boardId, data);
+      try {
+        const res = await addTask(boardId, data);
+        if (!res.ok) toast.error(res.error);
+      } catch {
+        toast.error('Failed to add task. Please try again.');
+      }
     });
   };
 
@@ -57,6 +63,7 @@ export default function TaskList({
             key={task._id.toString()}
             task={task}
             onClick={onTaskClick}
+            disabled={task._id.toString().startsWith('temp-')}
           />
         ))}
         <AddTaskButton onClick={() => setCreateDrawerOpen(true)} />

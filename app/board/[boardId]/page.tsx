@@ -1,5 +1,5 @@
 import BoardMain from '@/components/board/BoardMain';
-import { getBoard } from '@/lib/actions/boardActions';
+import { getBoard } from '@/lib/data/boards';
 import { notFound } from 'next/navigation';
 
 interface BoardPageProps {

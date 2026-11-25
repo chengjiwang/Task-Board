@@ -1,6 +1,5 @@
 'use server';
 
-import Board from '@/models/Board';
 import Task from '@/models/Task';
 import type { ITask } from '@/types';
 import { isValidObjectId } from 'mongoose';
@@ -8,27 +7,37 @@ import { revalidatePath } from 'next/cache';
 import connectDB from '../mongodb';
 import { TaskInput, TaskUpdateInput } from '../validation';
 
+export type ActionResult = { ok: true } | { ok: false; error: string };
+
 export async function addTask(
   boardId: string,
   data: Pick<ITask, 'name'> &
     Partial<Pick<ITask, 'description' | 'icon' | 'status'>>,
-): Promise<ITask> {
-  if (!isValidObjectId(boardId)) throw new Error('Invalid board ID');
-  const parsed = TaskInput.parse(data);
-  await connectDB();
-  const maxOrder = await Task.countDocuments({ boardId });
-  const task = await Task.create({
-    ...parsed,
-    boardId,
-    order: maxOrder,
-  });
-  await Board.findByIdAndUpdate(boardId, { $push: { tasks: task._id } });
+): Promise<ActionResult> {
+  if (!isValidObjectId(boardId)) {
+    return { ok: false, error: 'Invalid board ID' };
+  }
+  const parsed = TaskInput.safeParse(data);
+  if (!parsed.success) {
+    return { ok: false, error: 'Invalid task data' };
+  }
+  try {
+    await connectDB();
+    // Use max(order) + 1 rather than a count, so deleting tasks never
+    // causes a newly added task to reuse an existing order value.
+    const last = await Task.findOne({ boardId }).sort({ order: -1 }).lean();
+    await Task.create({
+      ...parsed.data,
+      boardId,
+      order: last ? last.order + 1 : 0,
+    });
+  } catch {
+    return { ok: false, error: 'Failed to add task. Please try again.' };
+  }
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
-  return JSON.parse(JSON.stringify(task));
+  return { ok: true };
 }
-
-export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export async function updateTask(
   taskId: string,
@@ -62,7 +71,6 @@ export async function deleteTask(
   }
   await connectDB();
   await Task.findByIdAndDelete(taskId);
-  await Board.findByIdAndUpdate(boardId, { $pull: { tasks: taskId } });
   revalidatePath(`/board/${boardId}`);
   revalidatePath('/');
   return { ok: true };
